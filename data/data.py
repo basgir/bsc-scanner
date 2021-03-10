@@ -4,7 +4,7 @@ import requests
 import pandas as pd
 import re
 from dateparser.date import DateDataParser
-from datetime import timedelta
+from datetime import timedelta, datetime
 import time
 import random
 import os
@@ -72,6 +72,7 @@ def retrieve_all_transaction():
     if len(all_jsons) >= 1:
         df_transactions = pd.concat(all_jsons)
         df_transactions = df_transactions.drop_duplicates(subset=["tx_hash"])
+        df_transactions.age = df_transactions.age.apply(lambda x: datetime.fromtimestamp(x/1000))
         return df_transactions
     else:
         return {"message": "no file found"}
