@@ -13,7 +13,7 @@ def home():
 
 @app.route('/transactions', methods=['GET'])
 def get_all_transactions():
-    return retrieve_all_transaction().to_csv(orient="records")
+    return retrieve_all_transaction().to_csv()
 
 @app.route('/tokens', methods=['GET'])
 def get_all_tokens_list():
@@ -21,12 +21,12 @@ def get_all_tokens_list():
 
 @app.route('/tokens/stats', methods=['GET'])
 def get_tokens_statistics():
-    return get_tokens_stats().to_csv(orient="records")
+    return get_tokens_stats().to_csv()
 
 @app.route('/transactions/refresh', methods=['GET'])
 def refresh_database():
     query_bsc()
-    return retrieve_all_transaction().to_csv(orient="index")
+    return retrieve_all_transaction().to_csv()
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
