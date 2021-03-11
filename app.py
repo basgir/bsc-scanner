@@ -27,6 +27,10 @@ def get_all_tokens_list():
 def get_tokens_statistics():
     return get_tokens_stats().to_csv()
 
+@app.route('/tokens/stats/json', methods=['GET'])
+def get_tokens_statistics_json():
+    return get_tokens_stats().to_json(orient="records")
+
 @app.route('/transactions/refresh', methods=['GET'])
 def refresh_database():
     query_bsc()
