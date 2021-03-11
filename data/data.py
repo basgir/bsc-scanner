@@ -91,6 +91,7 @@ def get_tokens_stats():
     :return:
     """
     df_transactions = retrieve_all_transaction()
+    df.value = df.value.apply(lambda x: float(x.replace("...","")) if isinstance(x, str) else  float(x))
     df_group = df_transactions.groupby("token").agg({'age': ['min', 'max'], 'token': ['count'], 'value': ['sum','max']})
     df_group = pd.DataFrame(df_group.to_records())
     df_group.columns = ['token', 'first_seen', 'last_seen', 'tx_count','total_value', 'max_value_in_tx']
