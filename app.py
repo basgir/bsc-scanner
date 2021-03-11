@@ -15,6 +15,10 @@ def home():
 def get_all_transactions():
     return retrieve_all_transaction().to_csv()
 
+@app.route('/transactions/json', methods=['GET'])
+def get_all_transactions_json():
+    return retrieve_all_transaction().to_json(orient="records")
+
 @app.route('/tokens', methods=['GET'])
 def get_all_tokens_list():
     return get_tokens_list()
