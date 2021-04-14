@@ -68,7 +68,7 @@ def retrieve_all_transaction():
 
     :return:
     """
-    all_jsons = [each for each in os.listdir("./bsc-txns/") if each.endswith(".json")][-10:]
+    all_jsons = [each for each in os.listdir("./bsc-txns/") if each.endswith(".json")][-30:]
     all_json_df = [pd.read_json(f"./bsc-txns/{each}") for each in all_jsons]
     if len(all_jsons) >= 1:
         df_transactions = pd.concat(all_json_df)
