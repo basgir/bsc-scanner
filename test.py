@@ -1,5 +1,5 @@
-from data.data import query_bsc
+from data.data import retrieve_all_transaction
 
 
 if __name__ == "__main__":
-    query_bsc()
+    retrieve_all_transaction()
