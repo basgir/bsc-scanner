@@ -1,11 +1,20 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, abort
 from flask_cors import CORS
-from data.data import retrieve_all_transaction, get_tokens_list, get_tokens_stats
-from data.data import query_bsc
+from data.data import retrieve_all_transaction, get_tokens_list, get_tokens_stats, read_token_stats, save_token_stats, query_bsc
+
+
+ip_ban_list = ['185.156.72.12']
 
 app = Flask(__name__)
 
 CORS(app)
+
+
+@app.before_request
+def block_method():
+    ip = request.environ.get('REMOTE_ADDR')
+    if ip in ip_ban_list:
+        abort(403)
 
 @app.route('/', methods=['GET'])
 def home():
@@ -25,11 +34,16 @@ def get_all_tokens_list():
 
 @app.route('/tokens/stats', methods=['GET'])
 def get_tokens_statistics():
-    return get_tokens_stats().to_csv()
+    return read_token_stats().to_csv()
 
 @app.route('/tokens/stats/json', methods=['GET'])
 def get_tokens_statistics_json():
     return get_tokens_stats().to_json(orient="records")
+
+@app.route('/tokens/stats/update', methods=['GET'])
+def save_new_token_stats():
+    save_token_stats()
+    return {"message": "ok"}
 
 @app.route('/transactions/refresh', methods=['GET'])
 def refresh_database():
@@ -37,4 +51,4 @@ def refresh_database():
     return retrieve_all_transaction().to_csv()
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=5786)

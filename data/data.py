@@ -68,7 +68,7 @@ def retrieve_all_transaction():
 
     :return:
     """
-    all_jsons = [pd.read_json(f"./bsc-txns/{each}") for each in os.listdir("./bsc-txns/") if each.endswith(".json")]
+    all_jsons = [pd.read_json(f"./bsc-txns/{each}") for each in os.listdir("./bsc-txns/") if each.endswith(".json")][-10:]
     if len(all_jsons) >= 1:
         df_transactions = pd.concat(all_jsons)
         df_transactions = df_transactions.drop_duplicates(subset=["tx_hash"])
@@ -97,13 +97,38 @@ def get_tokens_stats():
     df_group.columns = ['token', 'first_seen', 'last_seen', 'tx_count','total_value', 'max_value_in_tx']
     return df_group
 
+def read_token_stats():
+    """instead of computing stats on the fly we pre-compute them after each query bsc we do so that it's faster to load
+    """
+    import os
+    print("Reading token stats")
+    all_stats_files = sorted([each for each in os.listdir('./bsc-stats/') if each.endswith(".csv")])
+    print(f"Found {len(all_stats_files)}")
+    latest_stats_file = all_stats_files[-1]
+    print(f"Latest File {latest_stats_file}")
+    df_tmp = pd.read_csv(f"./bsc-stats/{latest_stats_file}", index_col=0)
+    df_tmp.sort_values("last_seen", ascending=False, inplace=True)
+    return df_tmp
+
+def save_token_stats():
+    """Process the token latest statistics"""
+    
+    timestamp = int(time.time())
+    print("Getting stats")
+    token_stats = get_tokens_stats()
+    print(f"Found stats. Here {len(token_stats)}")
+    token_stats.to_csv(f"./bsc-stats/{timestamp}.csv")
+    
+
 def query_bsc():
     """ Query BsCan
     :return:
     """
     page_list_size = 50 # We request the first 50 pages
-
     for each in range(1,page_list_size+1):
         print(f"fetching page {each}")
         df = get_transaction_list(page=each, save=True)
+    print("Finished getting the transactions")
+    print("Saving stats")
+    save_token_stats()
     return {"retrieved" : len(df)}
